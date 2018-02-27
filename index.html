@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    
+    <!-- <script src="scripts/require.js" data-main="scripts/main"></script> -->
+    <script src="scripts/uiScript.js"></script>
+ 
+    <title>Document</title>
+
+    <style>
+        img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="test">
+        姓名：
+        <input type="text" name="name"> </br>
+        性别：
+        <input type="text" name="sex"> </br>
+        年龄：
+        <input type="text" name="age"> </br>
+        其他 ：
+        <textarea name="other" id="" cols="30" rows="10"></textarea>
+        </br>
+        <select name="address" id="">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+        <input type="file" name="file" id="file" class="test test3">
+    </form>
+
+</body>
+
+<script>
+    var file = document.getElementById('file');
+    file.addEventListener('change', function () {
+        console.log(this);
+    })
+    window.onload=function(){
+        uiScript.setSession('name','hjh')
+        console.log(uiScript.getSession('name'))
+        uiScript.removeSession('name')
+        console.log(uiScript.getSession('name'))
+        uiScript.setSession('name','hjh')
+        console.log(uiScript.getSession('name'))
+        uiScript.clearSession()
+        console.log(uiScript.getSession('name'))
+    }
+</script>
+<script>
+   
+</script>
+
+</html>
