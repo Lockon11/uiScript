@@ -625,3 +625,110 @@ uiScript是一款由ui团队倾情打造，面向所有层次的前后端程序�
     </div>
 
 > *uiScript-用心与你沟通*
+
+
+#新增#
+
+##数字格式化##
+传入数字，千位分隔符，货币符号，返回对应格式。
+
+语法： uiscript.NumFormat(number, places, symbol, thousand, decimal);
+
+| 参数 | 类型 |说明|
+| - | - | - | 
+| number | number | 传入数字 |
+| places | number | 小数点保留位数 |
+| symbol | string |  头部添加符号 |
+| thousand | string | 千位分隔符 |
+| decimal | string | 小数点分隔符 |
+| return | string | 返回结果 |
+
+
+**示例**
+
+    
+    uiScript.NumFormat(this.number,2,'$',',','.');
+    //输出 $ 12,345,678.00
+    uiScript.NumFormat(this.number,0,'$',',','.');
+    //输出 $ 12,345,678
+
+> *uiScript-用心与你沟通*
+
+##图片压缩##
+将传入图片按设置压缩比例压缩之后返回新的图片。
+
+语法： uiscript.compress(source_img_obj, quality, output_format);
+
+| 参数 | 类型 |说明|
+| - | - | - | 
+| source_img_obj | image | 原图片 |
+| quality | number | 压缩比 0-100 |
+| output_format | string |  返回的图片类型，image/jpeg/image/png |
+
+> *uiScript-用心与你沟通*
+
+
+##去除首尾空格##
+去除字符串首尾空格。
+
+语法： uiscript.NumFormat(str);
+
+| 参数 | 类型 |说明|
+| - | - | - | 
+| str | string | 传入字符串 |
+| return | string | 返回结果 |
+
+
+
+**示例**
+
+    
+    uiScript.NumFormat('   abce d    ');
+    //返回 'abce d'
+
+> *uiScript-用心与你沟通*
+
+##获取dom节点的绝对位置##
+获取dom节点在页面中的绝对位置
+
+语法： uiscript.getDomPosition(dom);
+
+| 参数 | 类型 |说明|
+| - | - | - | 
+| dom | dom | 传入dom节点 |
+| return | object | 返回结果 |
+
+
+
+**示例**
+
+    
+    uiscript.getDomPosition(dom);
+    //返回 {left:100,top:100}
+
+> *uiScript-用心与你沟通*
+
+##放大镜##
+放大指定区域图片
+
+语法： uiscript.magnifyGlass(arg);
+
+| 参数 | 类型 |说明|-|
+| - | - | - | -|
+| arg | object | 传入参数 |-|
+|-| 参数 | 类型 |说明|
+|  | id | dom |节点|
+|  | img  | string | 图片路径|
+|  | width | number |正方形放大镜的宽度|
+|  | mulriple | number | 放大倍数 大于1的整数|
+
+
+
+
+**示例**
+
+    
+   uiScript.magnifyGlass({ id:id, img:url, width:width, mulriple:num })
+   
+
+> *uiScript-用心与你沟通*

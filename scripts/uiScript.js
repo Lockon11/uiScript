@@ -2,6 +2,31 @@
 
     'use strict'
     var _global;
+    //ES6 Object.assign()
+    if (!Object.assign) {
+        Object.defineProperty(Object, "assign", {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: function(target, firstSource) {
+            "use strict";
+            if (target === undefined || target === null)
+                throw new TypeError("Cannot convert first argument to object");
+            var to = Object(target);
+            for (var i = 1; i < arguments.length; i++) {
+                var nextSource = arguments[i];
+                if (nextSource === undefined || nextSource === null) continue;
+                var keysArray = Object.keys(Object(nextSource));
+                for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+                var nextKey = keysArray[nextIndex];
+                var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+                if (desc !== undefined && desc.enumerable) to[nextKey] = nextSource[nextKey];
+                }
+            }
+            return to;
+            }
+        });
+    }
     var uiScript = {
         version: 'v1.0.0',
         print: function () {
@@ -59,15 +84,15 @@
             }else{
                 return year + symbol + month + symbol + date + ' ' + hour + ':' + minute + ':' + second;
             }
-           
+
         },
         /**
          * 某个时间在当前时间的多久前
-         * 
-         * @param {date} time 
+         *
+         * @param {date} time
          */
         timeAgo:function(time){
-           
+
             var timeTest=time.getTime();
             var now=(new Date()).getTime();
             var rTime=now-timeTest;
@@ -78,7 +103,7 @@
                 if(rTime/86400000>1){
                     return parseInt(rTime/86400000)+'天前';
                 }else{
-                  
+
                     if(rTime/3600000>1){
                         return parseInt(rTime/3600000)+'小时前';
                     }else{
@@ -93,29 +118,29 @@
         },
         /**
          * 倒计时
-         * 
-         * @param {string} id 
-         * @param {Date} endDate 
-         *  
+         *
+         * @param {string} id
+         * @param {Date} endDate
+         *
          */
         countdown:function(id,endDate){
-            
+
              var showTime=function(){
-                 
-                    var date = new Date();  
-                    var now = date.getTime();  
-                    var end = endDate.getTime();  
-                    var leftTime = end-now; 
-                    var d,h,m,s;  
-                    if (leftTime>=0) {  
-                        d = Math.floor(leftTime/1000/60/60/24);  
-                        h = Math.floor(leftTime/1000/60/60%24);  
-                        m = Math.floor(leftTime/1000/60%60);  
-                        s = Math.floor(leftTime/1000%60); 
+
+                    var date = new Date();
+                    var now = date.getTime();
+                    var end = endDate.getTime();
+                    var leftTime = end-now;
+                    var d,h,m,s;
+                    if (leftTime>=0) {
+                        d = Math.floor(leftTime/1000/60/60/24);
+                        h = Math.floor(leftTime/1000/60/60%24);
+                        m = Math.floor(leftTime/1000/60%60);
+                        s = Math.floor(leftTime/1000%60);
                     } else{
                         clearInterval(t);
                     }
-                    document.getElementById(id).innerHTML=d+'天'+h+'时'+m+'分'+s+'秒';                                
+                    document.getElementById(id).innerHTML=d+'天'+h+'时'+m+'分'+s+'秒';
             }
              var t = setInterval(showTime,1000);
          },
@@ -423,7 +448,7 @@
             if (!search) {
                 return {}
             }
-            return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+            return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
         },
         /**
          *
@@ -434,6 +459,7 @@
         stringfyQueryString(obj) {
             if (!obj) return '';
             var pairs = [];
+
             for (var key in obj) {
                 var value = obj[key];
 
@@ -489,6 +515,11 @@
          *
          * @param {paramName} 需要获取的参数
          * @returns  {paramValue} 参数值
+        /**
+         *
+         *
+         * @param {any} paramName
+         * @returns
          */
         getParam: function (paramName) {
             var paramValue = '', isFound = false;
@@ -506,8 +537,251 @@
                 }
             }
             return paramValue;
-        }
+        },
+        /**
+         *
+         * 图片转base64
+         * @param {object or string} data
+         */
+        getBase64:function(data){
+            this.init=function(img){
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                var dataURL = canvas.toDataURL("image/png");
+                return dataURL
+            }
+            if(typeof(data)==='object'){
+                return this.init(data);
+            }else{
+                var image =  new Image();
+                image.src=data;
 
+                if(image.fileSize>0 || (image.width > 0 && image.height > 0)){
+                    return  this.init(image)
+                }else{
+                    console.log('图片不存在，或图片地址有误');
+                }
+            }
+
+
+        },
+        /**
+         *
+         * 数字格式化
+         * @param {num} number
+         * @param {num} places
+         * @param {string} symbol
+         * @param {string} thousand
+         * @param {string} decimal
+         * @returns
+         */
+        NumFormat :function(number, places, symbol, thousand, decimal){
+            	places = !isNaN(places = Math.abs(places)) ? places : 2;
+                symbol = symbol !== undefined ? symbol : "$";
+                thousand = thousand || ",";
+                decimal = decimal || ".";
+               var  negative = number < 0 ? "-" : "",
+                i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+                return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : "");
+
+        },
+         /**
+         * 图片压缩
+         * @param {Image} source_img_obj 原图片
+         * @param {Integer} quality 压缩比 0-100
+         * @param {string} output_format 返回的图片类型，jpg/png
+         * @return {Image} 压缩后的图片
+         */
+        compress: function(source_img_obj, quality, output_format){
+            var mime_type = "image/jpeg";
+            if(output_format!=undefined && output_format=="png"){
+               mime_type = "image/png";
+            }
+            var cvs = document.createElement('canvas');
+            //naturalWidth真实图片的宽度
+            cvs.width = source_img_obj.naturalWidth;
+            cvs.height = source_img_obj.naturalHeight;
+            var ctx = cvs.getContext("2d").drawImage(source_img_obj, 0, 0);
+            var newImageData = cvs.toDataURL(mime_type, quality/100);
+            var result_image_obj = new Image();
+            result_image_obj.src = newImageData;
+            return result_image_obj;
+       },
+        /**
+         *
+         * 去除首尾空格
+         * @param {str} str
+         * @returns
+         */
+        trim:function(str){
+            return str.replace(/(^[\s\n\t]+|[\s\n\t]+$)/g, "");
+        },
+
+        /**
+         * 获取dom节点的绝对位置
+         * 
+         * @param {any} dom 
+         * @returns {object}
+         */
+        getDomPosition:function(dom){
+            return {
+                left:dom.getBoundingClientRect().left+document.documentElement.scrollLeft,
+                top:dom.getBoundingClientRect().top+document.documentElement.scrollTop
+            }
+        },
+        /*
+        * 多行文本省略
+        * @param {str} id
+        * @param {number} rows
+        * @param {str} text
+        * @returns
+        * */
+        multiOverflowhidden:function(id,rows,str){
+            var el=document.querySelector(id);
+
+            el.addEventListener('mouseover',function () {
+                this.title=str;
+            })
+            var lineHeight=window.getComputedStyle(el,null).lineHeight;
+            var at = rows* parseInt(lineHeight);
+            var tempstr =str;
+            el.innerHTML =tempstr;
+
+            var len =tempstr.length;
+            var i=0;
+            if(el.offsetHeight <= at){
+
+            }else{
+              var temp ="";
+              el.innerHTML =temp;
+              while(el.offsetHeight <= at){
+                temp =tempstr.substring(0,i+1);
+                i++;
+                el.innerHTML =temp;
+              }
+
+              var slen =temp.length;
+              tempstr =temp.substring(0,slen-1);
+              len =tempstr.length;
+              el.innerHTML =tempstr.substring(0,len-3) +"...";
+              el.height=at+'px';
+            }
+        },
+
+         //放大镜
+         magnifyGlass:function(arg){
+            //默认参数
+            var def={
+                width:200,
+                mulriple:2,
+                position:'right'
+            };
+            var opt=Object.assign({},arg,def);
+            
+            var target=document.getElementById(opt.id);
+            if(target.style.position==''){
+                target.style.position='relative';
+            }
+            
+            target.style.background="url("+opt.img+") no-repeat";
+            target.style.backgroundSize="100%";
+            //滤镜
+            function Glass(target,opt){
+                var gls=document.createElement('div');
+                gls.style.width=opt.width+'px';
+                gls.style.height=opt.width+'px';
+                gls.style.position='absolute';
+                gls.style.background='#fff';
+                gls.style.opacity=0.6;
+                gls.style.filter='alpha(opacity=60)';
+                gls.style.display='none';
+                gls.style.cursor='crosshair';
+                
+                target.appendChild(gls);
+                //获取边界
+                var limitX=target.clientWidth;
+                var limitY=target.clientHeight;
+                target.addEventListener('mouseenter',function(){
+                    showGlass.show();
+                })
+                //target区域添加mousemove事件
+                 target.addEventListener('mousemove',function(e){
+                    
+                    if(e.target==target){
+                        gls.style.display='block';
+                        //左右边界
+                        if(e.offsetX-opt.width/2<=0){
+                            gls.style.left=0;
+                        }else if(e.offsetX>=limitX-opt.width){
+                            gls.style.left=limitX-opt.width+'px';
+                        }else{
+                            gls.style.left=e.offsetX-opt.width/2+'px';
+                        }
+                        
+                        gls.style.top=e.offsetY-opt.width/2+'px';
+                    }else{
+                       
+                        if(e.offsetX-opt.width/2+parseInt(e.target.style.left)<=0){
+                            gls.style.left=0;
+                        }else if(e.offsetX+parseInt(e.target.style.left)>=limitX-opt.width/2){
+                            gls.style.left=limitX-opt.width+'px';
+                        }else{
+                            e.target.style.left=e.offsetX-opt.width/2+parseInt(e.target.style.left)+'px';
+                        }
+                        //上下边界
+                        if(e.offsetY-opt.width/2+parseInt(e.target.style.top)<=0){
+                            gls.style.top=0;
+                        }else if(e.offsetY+parseInt(e.target.style.top)>=limitY-opt.width/2){
+                            gls.style.top=limitY-opt.width+'px';
+                        }else{
+                            e.target.style.top=e.offsetY-opt.width/2+parseInt(e.target.style.top)+'px';
+                        }
+                       
+                    }
+                    showGlass.changePosition(parseInt(e.target.style.left),parseInt(e.target.style.top));
+                });
+                //target添加mouseleave事件
+                target.addEventListener('mouseleave',function(){
+                    gls.style.display='none';
+                    showGlass.hide();
+                })
+            }
+            //显示区域
+            function ShowPlace(target,opt){
+                var position=uiScript.getDomPosition(target);
+                var showPlace = document.createElement('div');
+                document.body.appendChild(showPlace);
+                showPlace.style.width=opt.width*opt.mulriple+'px';
+                showPlace.style.height=opt.width*opt.mulriple+'px';
+                showPlace.style.position='absolute';
+                showPlace.style.display='none';
+                showPlace.style.left=position.left+target.clientWidth+5+'px';
+                showPlace.style.top=position.top+'px';
+                showPlace.style.border="1px solid #ddd";
+                showPlace.style.backgroundImage="url("+opt.img+")";
+                showPlace.style.backgroundPosition="0px 0px";
+                showPlace.style.backgroundRepeat="no-repeat";
+                showPlace.style.backgroundSize=opt.mulriple*target.clientWidth+'px';
+
+                this.changePosition=function(x,y){
+                
+                    showPlace.style.backgroundPosition='-'+opt.mulriple*x+'px -'+opt.mulriple*y+'px';
+                }
+                this.hide=function(){
+                    showPlace.style.display='none';
+                }
+                this.show=function(){
+                    showPlace.style.display='block';
+                }
+            }
+            var showGlass= new ShowPlace(target,opt);
+            new Glass(target,opt);
+            
+        }
 
     }
     uiScript.print();
